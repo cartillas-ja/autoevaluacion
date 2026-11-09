@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel de la profe</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF6FF;--card:#fff;--ink:#1D2B53;--soft:#5B6A8F;--line:#CFE3F5;--sun:#FFC93C;--mint:#2FBF8F;--sky:#4DB1F2;--sel:#FFF1C2;--coral:#FF7A6B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif;font-size:17px;line-height:1.35}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:1.7rem;margin:0;font-weight:800} h2{font-size:1.3rem;margin:0 0 8px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px;margin-top:14px}
+input{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 12px;width:100%;margin:4px 0 12px}
+.btn{font:inherit;font-weight:800;cursor:pointer;border-radius:14px;border:2px solid var(--mint);background:var(--mint);color:#fff;padding:8px 16px}
+.btn.alt{background:var(--card);color:var(--ink);border-color:var(--line)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tools input{width:200px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--sel);border-radius:16px;padding:12px}
+.stat b{display:block;font-size:1.9rem;line-height:1.1}
+.qrow{margin:12px 0}
+.qrow p{margin:0 0 4px;font-weight:700}
+.stack{display:flex;height:22px;border-radius:99px;overflow:hidden;background:#EEF3F9}
+.stack div{height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem;color:var(--soft);margin-top:4px}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 6px;border-bottom:2px dashed var(--line);vertical-align:top}
+tr.al{cursor:pointer} tr.al:hover{background:#F5FAFF}
+.det td{background:#F5FAFF}
+.det div{margin:2px 0}
+.pill{display:inline-block;padding:0 10px;border-radius:99px;font-weight:800}
+.muted{color:var(--soft)} .err{color:#C0392B;font-weight:800}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="login" class="card hidden" style="max-width:420px;margin:60px auto">
+    <h1>✈️ Panel de la profe</h1>
+    <p class="muted">Aquí ves los vuelos de tus estudiantes. Solo tú puedes entrar.</p>
+    <label for="em">Correo</label><input id="em" type="email" autocomplete="username">
+    <label for="pw">Contraseña</label><input id="pw" type="password" autocomplete="current-password">
+    <button class="btn" id="entrar">Entrar</button>
+    <p class="err hidden" id="lerr"></p>
+  </div>
+
+  <div id="panel" class="hidden">
+    <div class="top">
+      <h1>✈️ Vuelos de mis estudiantes</h1>
+      <div class="tools">
+        <input id="buscar" placeholder="Buscar nombre…">
+        <button class="btn" id="csv">Descargar Excel</button>
+        <button class="btn alt" id="salir">Salir</button>
+      </div>
+    </div>
+    <div class="card"><div class="stats" id="stats"></div></div>
+    <div class="card">
+      <h2>¿Cómo respondió el grupo?</h2>
+      <div id="dist"></div>
+      <div class="legend" id="leg"></div>
+    </div>
+    <div class="card">
+      <h2>Cada piloto</h2>
+      <p class="muted" style="margin:0 0 6px">Toca un nombre para ver sus respuestas.</p>
+      <table><thead><tr><th>Nombre</th><th>Fecha</th><th>Nota</th></tr></thead><tbody id="tabla"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig, CARAS, PREGUNTAS } from "./config.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app), db = getFirestore(app);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const COLORES = ["var(--mint)", "var(--sun)", "var(--coral)"];
+const OPC = [...CARAS.map(c => c[1]), "Sin responder"];
+let datos = [], unsub = null, abierto = null;
+
+$("leg").innerHTML = CARAS.map((c,i) => `<span><span class="dot" style="background:${COLORES[i]}"></span>${c[0]} ${esc(c[1])}</span>`).join("")
+  + `<span><span class="dot" style="background:#D5DEEA"></span>Sin responder</span>`;
+
+$("entrar").onclick = async () => {
+  $("lerr").classList.add("hidden");
+  try { await signInWithEmailAndPassword(auth, $("em").value.trim(), $("pw").value); }
+  catch { $("lerr").textContent = "Correo o contraseña incorrectos."; $("lerr").classList.remove("hidden"); }
+};
+$("pw").addEventListener("keydown", e => { if (e.key === "Enter") $("entrar").click(); });
+$("salir").onclick = () => signOut(auth);
+$("buscar").oninput = pintar;
+$("csv").onclick = csv;
+
+onAuthStateChanged(auth, u => {
+  if (unsub) { unsub(); unsub = null; }
+  $("login").classList.toggle("hidden", !!u);
+  $("panel").classList.toggle("hidden", !u);
+  if (!u) return;
+  unsub = onSnapshot(query(collection(db, "respuestas"), orderBy("fecha", "desc")),
+    snap => { datos = snap.docs.map(d => ({ id: d.id, ...d.data() })); pintar(); },
+    err => { console.error(err); $("stats").innerHTML = `<p class="err">No tienes permiso para ver las respuestas. Revisa que tu correo esté escrito en las reglas de Firestore.</p>`; });
+});
+
+const fecha = r => r.fecha?.toDate ? r.fecha.toDate() : null;
+const fmtF = d => d ? d.toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" }) : "—";
+const fmtN = n => typeof n === "number" ? n.toFixed(1).replace(".", ",") : "—";
+const colorNota = n => n >= 4 ? "#D6F5E9" : n >= 3 ? "var(--sel)" : "#FFE1DD";
+const filtrados = () => { const b = $("buscar").value.trim().toLowerCase(); return datos.filter(r => !b || (r.nombre||"").toLowerCase().includes(b)); };
+
+function pintar(){
+  const L = filtrados();
+  const notas = L.map(r => r.nota).filter(n => typeof n === "number");
+  const prom = notas.length ? notas.reduce((a,b)=>a+b,0)/notas.length : null;
+  const estrellas = notas.filter(n => n >= 4.5).length;
+  const apoyo = notas.filter(n => n < 3).length;
+  $("stats").innerHTML = `
+    <div class="stat"><b>${L.length}</b>vuelos recibidos</div>
+    <div class="stat"><b>${fmtN(prom)}</b>nota promedio (de 5)</div>
+    <div class="stat"><b>${estrellas}</b>pilotos estrella 🌟 (4,5 o más)</div>
+    <div class="stat"><b>${apoyo}</b>necesitan apoyo 🤗 (menos de 3)</div>`;
+
+  $("dist").innerHTML = PREGUNTAS.map((q,i) => {
+    const cuenta = OPC.map(o => L.filter(r => (r.respuestas?.["p"+(i+1)] ?? "Sin responder") === o).length);
+    const tot = L.length || 1;
+    const seg = cuenta.map((n,j) => n ? `<div title="${esc(OPC[j])}: ${n}" style="width:${n/tot*100}%;background:${COLORES[j] || "#D5DEEA"}"></div>` : "").join("");
+    const txt = CARAS.map((c,j) => `${c[0]} ${cuenta[j]}`).join(" · ") + (cuenta[3] ? ` · sin responder ${cuenta[3]}` : "");
+    return `<div class="qrow"><p>${esc(q)}</p><div class="stack">${seg}</div><div class="muted" style="font-size:.9rem">${txt}</div></div>`;
+  }).join("");
+
+  $("tabla").innerHTML = L.length ? L.map(r => {
+    const fila = `<tr class="al" data-id="${r.id}"><td><b>${esc(r.nombre)}</b></td><td>${fmtF(fecha(r))}</td><td><span class="pill" style="background:${colorNota(r.nota)}">${fmtN(r.nota)}</span></td></tr>`;
+    if (abierto !== r.id) return fila;
+    const det = PREGUNTAS.map((q,i) => {
+      const v = r.respuestas?.["p"+(i+1)] ?? "Sin responder";
+      const cara = (CARAS.find(c => c[1] === v) || ["▫️"])[0];
+      return `<div>${esc(q)} → <b>${cara} ${esc(v)}</b></div>`;
+    }).join("");
+    return fila + `<tr class="det"><td colspan="3">${det}</td></tr>`;
+  }).join("") : `<tr><td colspan="3" class="muted">Todavía no hay vuelos. Cuando un estudiante toque “¡Aterrizar!”, aparecerá aquí.</td></tr>`;
+
+  document.querySelectorAll("tr.al").forEach(tr => tr.onclick = () => { abierto = abierto === tr.dataset.id ? null : tr.dataset.id; pintar(); });
+}
+
+function csv(){
+  const c = v => `"${String(v ?? "").replace(/"/g,'""')}"`;
+  const head = ["Nombre", "Fecha", ...PREGUNTAS, "Nota (de 5)"];
+  const rows = filtrados().map(r => [r.nombre, fmtF(fecha(r)), ...PREGUNTAS.map((q,i) => r.respuestas?.["p"+(i+1)] ?? "Sin responder"), fmtN(r.nota)]);
+  const texto = "﻿" + [head, ...rows].map(f => f.map(c).join(";")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([texto], { type: "text/csv;charset=utf-8" }));
+  a.download = "autoevaluaciones.csv"; a.click();
+}
+</script>
+</body>
+</html>
