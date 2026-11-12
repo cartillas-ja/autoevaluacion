@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pasaporte al Nuevo Año Escolar · CADESPRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --sky1:#bfe6fb;--sky2:#fdf0d5;--ink:#1c2b4a;--muted:#55648a;
+  --cover:#1d3b6e;--cover2:#2a56a0;--gold:#f2b84b;
+  --paper:#fff9ea;--line:#e5d6ae;--card:#ffffff;--slot:#f6ecd2;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--sky1:#142347;--sky2:#2a2150;--ink:#f3eefc;--muted:#b9c0dd;--paper:#2b2a4a;--line:#4a4876;--card:#222444;--slot:#35345a;}
+}
+:root[data-theme="dark"]{--sky1:#142347;--sky2:#2a2150;--ink:#f3eefc;--muted:#b9c0dd;--paper:#2b2a4a;--line:#4a4876;--card:#222444;--slot:#35345a;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Nunito",system-ui,sans-serif;color:var(--ink);background:linear-gradient(170deg,var(--sky1),var(--sky2));min-height:100vh;padding:20px 14px 48px;position:relative;overflow-x:hidden}
+.cloud{position:absolute;font-size:44px;opacity:.7;animation:drift 40s linear infinite;pointer-events:none}
+@keyframes drift{from{transform:translateX(-80px)}to{transform:translateX(110vw)}}
+h1,h2,h3{font-family:"Fredoka",system-ui,sans-serif;margin:0}
+.wrap{max-width:860px;margin:0 auto;position:relative}
+.cover{background:radial-gradient(circle at 50% 30%,var(--cover2),var(--cover));color:#fff;border-radius:28px;padding:28px 22px 24px;text-align:center;border:4px solid var(--gold);box-shadow:0 12px 30px rgba(20,35,80,.3)}
+.cover .globe{font-size:64px;line-height:1}
+.cover h1{font-size:clamp(26px,6vw,42px);color:var(--gold);letter-spacing:.5px;margin:6px 0 4px}
+.cover p{margin:0;font-size:17px}
+.cover .badge{display:inline-block;margin-top:12px;border:2px dashed var(--gold);border-radius:999px;padding:6px 16px;font-weight:700;font-size:14px}
+.card{background:var(--card);border-radius:22px;padding:18px;margin-top:18px;box-shadow:0 6px 18px rgba(20,35,80,.12)}
+.card h2{font-size:21px;margin-bottom:10px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+label{font-weight:700;font-size:14px;display:block;margin-bottom:4px}
+input,textarea{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
+input:focus,textarea:focus,.slot:focus-visible,button:focus-visible{outline:3px solid #2f7fd1;outline-offset:2px}
+.page{background:var(--paper);border-radius:22px;border:3px solid var(--line);padding:20px 16px 22px;margin-top:18px;box-shadow:inset 0 0 0 6px var(--card),0 8px 22px rgba(20,35,80,.15);position:relative}
+.id{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-bottom:2px dashed var(--line);padding-bottom:14px;margin-bottom:16px}
+.photo{width:64px;height:64px;border-radius:50%;background:var(--slot);display:grid;place-items:center;font-size:32px;border:3px solid var(--gold)}
+.id h2{font-size:24px;word-break:break-word}
+.id small{display:block;color:var(--muted);font-size:14px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:620px){.grid{grid-template-columns:repeat(2,1fr)}}
+.slot{background:transparent;border:0;font:inherit;color:inherit;cursor:pointer;text-align:center;padding:6px 4px;border-radius:18px}
+.slot:disabled{cursor:default}
+.disc{position:relative;width:min(130px,100%);aspect-ratio:1;margin:0 auto;border-radius:50%;background:var(--slot);border:3px dashed var(--line);display:grid;place-items:center;transition:transform .15s}
+.slot:not(:disabled):hover .disc{transform:scale(1.04)}
+.disc .ghost{font-size:44px;filter:grayscale(1);opacity:.35}
+.disc svg{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);opacity:0;transform:scale(2.2) rotate(-25deg)}
+.slot[aria-pressed="true"] .disc{border-color:transparent;background:transparent}
+.slot[aria-pressed="true"] .ghost{display:none}
+.slot[aria-pressed="true"] svg{opacity:.92;transform:scale(1) rotate(var(--rot,-8deg));transition:transform .35s cubic-bezier(.2,1.6,.4,1),opacity .15s}
+.slot .txt{display:block;margin-top:8px;font-weight:700;font-size:14px;line-height:1.25}
+.slot .pts{display:inline-block;margin-top:4px;background:var(--gold);color:#4a3200;font-family:"Fredoka",system-ui,sans-serif;font-weight:700;font-size:14px;border-radius:999px;padding:1px 12px}
+.score{font-family:"Fredoka",system-ui,sans-serif;font-size:26px;font-weight:700;text-align:center;margin-bottom:4px;color:var(--cover2)}
+@media (prefers-color-scheme:dark){.score{color:var(--gold)}}
+.slot .hint{display:block;font-size:12px;color:var(--muted)}
+.slot[aria-pressed="true"] .hint{color:#1f9d72;font-weight:700}
+.bar{height:16px;background:var(--slot);border-radius:999px;margin:18px 0 8px;position:relative}
+.bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#7fd8b5,#2f7fd1);transition:width .5s}
+.bar b{position:absolute;top:-12px;left:0;font-size:26px;transition:left .5s;transform:translateX(-50%)}
+.msg{font-family:"Fredoka",system-ui,sans-serif;font-size:19px;text-align:center;min-height:30px}
+.visa{display:none;margin-top:14px;border:3px double #1f9d72;color:#1f9d72;border-radius:16px;padding:12px;text-align:center;font-family:"Fredoka",system-ui,sans-serif;font-size:20px;transform:rotate(-2deg);background:rgba(127,216,181,.15)}
+.visa.on{display:block;animation:pop .5s}
+@keyframes pop{from{transform:scale(.5) rotate(8deg);opacity:0}to{transform:scale(1) rotate(-2deg);opacity:1}}
+.honest{font-size:14px;color:var(--muted);text-align:center;margin:12px 0 0}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+button.btn{font:600 16px "Fredoka",system-ui,sans-serif;border:0;border-radius:999px;padding:11px 22px;cursor:pointer;background:var(--cover);color:#fff}
+button.btn.alt{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+button.btn.send{background:#1f9d72;font-size:18px;padding:13px 28px}
+button.btn:disabled{opacity:.6;cursor:wait}
+.cover{position:relative;background-image:radial-gradient(circle at 50% 30%,var(--cover2),var(--cover))}
+.cover::before{content:"";position:absolute;inset:10px;border:2px solid rgba(242,184,75,.55);border-radius:20px;pointer-events:none}
+.cover .top{font-family:"Fredoka",system-ui,sans-serif;font-weight:600;letter-spacing:4px;font-size:13px;color:var(--gold);margin-bottom:12px}
+.emblem{width:112px;height:112px;margin:0 auto 8px;border-radius:50%;border:3px solid var(--gold);display:grid;place-items:center;position:relative;background:rgba(255,255,255,.08);box-shadow:0 0 0 7px rgba(242,184,75,.22)}
+.emblem .g{font-size:60px;line-height:1}
+.emblem .l{position:absolute;right:-10px;bottom:-6px;font-size:40px}
+.emblem .c{position:absolute;left:-8px;top:-4px;font-size:30px}
+.doodles{margin-top:16px;font-size:26px;letter-spacing:10px;opacity:.95}
+.page{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130'%3E%3Ctext x='8' y='42' font-size='26' opacity='.13'%3E💻%3C/text%3E%3Ctext x='72' y='36' font-size='22' opacity='.12'%3E📚%3C/text%3E%3Ctext x='70' y='106' font-size='26' opacity='.13'%3E✈️%3C/text%3E%3Ctext x='10' y='108' font-size='22' opacity='.12'%3E🌍%3C/text%3E%3C/svg%3E")}
+.phead{display:flex;justify-content:center;align-items:center;gap:12px;font-family:"Fredoka",system-ui,sans-serif;font-weight:700;letter-spacing:3px;font-size:15px;color:var(--cover2);border-bottom:3px double var(--line);padding-bottom:10px;margin-bottom:14px}
+@media (prefers-color-scheme:dark){.phead{color:var(--gold)}}
+.page .id{border-bottom:0;margin-bottom:6px}
+.mrz{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(9px,2.4vw,13px);line-height:1.5;letter-spacing:1px;white-space:pre-wrap;word-break:break-all;color:var(--muted);background:var(--slot);border-radius:10px;padding:8px 10px;margin-bottom:18px}
+.alert{margin-top:14px;text-align:center;font-weight:700;border-radius:14px;padding:10px 14px;background:#fde7c4;color:#6b4300}
+.ok{margin-top:16px;text-align:center;font-family:"Fredoka",system-ui,sans-serif;font-size:20px;border-radius:18px;padding:14px;background:rgba(127,216,181,.25);color:#147a57;border:2px solid #7fd8b5}
+@media (prefers-color-scheme:dark){.ok{color:#9ff0cf}.alert{background:#4a3a16;color:#ffe3a8}}
+.hidden{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{.cloud,.actions,.setup,.alert,.ok{display:none!important}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<span class="cloud" style="top:30px">☁️</span><span class="cloud" style="top:240px;animation-duration:55s;font-size:34px">☁️</span>
+<div class="wrap">
+  <header class="cover">
+    <div class="top">PASAPORTE VIRTUAL · PASSPORT</div>
+    <div class="emblem"><span class="g">🌎</span><span class="l">💻</span><span class="c">🎓</span></div>
+    <h1>Pasaporte al nuevo año escolar</h1>
+    <p>Colegio CADESPRO · Clases con la Profe Marcela</p>
+    <span class="badge">✈️ Viaje de 2026 hacia 2027</span>
+    <div class="doodles" aria-hidden="true">📚✏️🎒🧭📹🏫</div>
+  </header>
+
+  <section class="card setup">
+    <h2>1. Llena tus datos de viajero</h2>
+    <div class="fields">
+      <div><label for="n">Mi nombre y apellido</label><input id="n" maxlength="40" placeholder="Escribe tu nombre" autocomplete="off"></div>
+      <div><label for="g">Mi grado</label><input id="g" maxlength="20" placeholder="Ej: 7° B" autocomplete="off"></div>
+      <div><label for="m">Materia con la Profe Marce</label><input id="m" maxlength="40" placeholder="Ej: Inglés" autocomplete="off"></div>
+    </div>
+  </section>
+
+  <section class="page" aria-label="Pasaporte">
+    <div class="phead"><span>🛂</span>PASAPORTE DE CLASES VIRTUALES<span>💻</span></div>
+    <div class="id">
+      <div class="photo" aria-hidden="true">🧑‍🚀</div>
+      <div>
+        <h2 id="pn">Viajero sin nombre</h2>
+        <small id="pg">Grado: ___ · Materia: ___</small>
+        <small>Año escolar 2026 · Colegio virtual CADESPRO 🌐</small>
+        <small>Guía del viaje: Profe Marcela 📚</small>
+      </div>
+    </div>
+
+    <div class="mrz" id="mrz" aria-hidden="true"></div>
+    <h3 style="text-align:center;margin-bottom:12px">2. Toca un sello solo si de verdad lo lograste</h3>
+    <div class="grid" id="grid"></div>
+
+    <div class="bar" aria-hidden="true"><i id="fill"></i><b id="plane">✈️</b></div>
+    <div class="score" id="score">Mi nota: 0.0 / 5.0</div>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    <div class="visa" id="visa">🛂 ¡VISA APROBADA!<br><span id="vname"></span> entra al nuevo año escolar 🌟</div>
+    <p class="honest">Los 6 sellos suman 5.0. Si no lo lograste, deja el sello vacío: el avión solo avanza con lo que de verdad hiciste. Es una meta para el próximo viaje. 💛</p>
+  </section>
+
+  <section class="card setup">
+    <h2>3. Mi meta para el nuevo año</h2>
+    <textarea id="goal" rows="2" maxlength="160" placeholder="Ej: Quiero enviar todos mis trabajos a tiempo…"></textarea>
+  </section>
+
+  <div class="alert hidden" id="alert" role="alert"></div>
+  <div class="ok hidden" id="ok">✅ ¡Tu pasaporte llegó a la Profe Marce!<br><small>Ya puedes guardarlo o imprimirlo si quieres.</small></div>
+
+  <div class="actions">
+    <button class="btn send" id="send">✉️ Enviar mi pasaporte a la Profe Marce</button>
+    <button class="btn alt" id="print">🖨️ Guardar o imprimir</button>
+    <button class="btn alt" id="reset">🔄 Empezar de nuevo</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig, COLECCION, SELLOS as S } from "./config.js";
+
+const db = getFirestore(initializeApp(firebaseConfig));
+const P = S.map(s => s.p);
+const msgs=["Tu pasaporte espera sus primeros sellos. 🌱","¡Buen comienzo, viajero! 🎒","¡Vas avanzando con honestidad! 🚀","¡Ya tienes la mitad del viaje! 🌈","¡Casi listo para despegar! ✈️","¡Un sello más y tu visa es tuya! 🌟","¡Todos los sellos! Eres un gran viajero. 🏆"];
+const grid=document.getElementById("grid");
+const $=id=>document.getElementById(id);
+let enviado=false, enviando=false;
+
+S.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.className="slot";b.type="button";b.setAttribute("aria-pressed","false");
+  b.style.setProperty("--rot",((i*7)%17-8)+"deg");
+  b.innerHTML=`<span class="disc"><span class="ghost">${s.e}</span>
+  <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="#fff" fill-opacity=".85" stroke="${s.c}" stroke-width="3.5"/><circle cx="50" cy="50" r="38" fill="none" stroke="${s.c}" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <path id="a${i}" d="M14,50 a36,36 0 1,1 72,0" fill="none"/><text font-family="Fredoka,sans-serif" font-weight="700" font-size="9" fill="${s.c}" letter-spacing="1.2"><textPath href="#a${i}" startOffset="50%" text-anchor="middle">CADESPRO 2026</textPath></text>
+  <text x="50" y="62" text-anchor="middle" font-size="32">${s.e}</text>
+  <text x="50" y="84" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="8" fill="${s.c}">¡LO LOGRÉ!</text></svg></span>
+  <span class="txt">${s.t}</span><span class="pts">+${P[i].toFixed(1)}</span><span class="hint">Toca para sellar</span>`;
+  b.onclick=()=>{if(enviado)return;const on=b.getAttribute("aria-pressed")==="true";b.setAttribute("aria-pressed",!on);b.querySelector(".hint").textContent=on?"Toca para sellar":"¡Sellado! ✔";update();};
+  grid.appendChild(b);
+});
+
+function sellados(){return [...grid.children].map(b=>b.getAttribute("aria-pressed")==="true")}
+function total(){return sellados().reduce((a,on,i)=>a+(on?P[i]:0),0)}
+
+function update(){
+  const n=sellados().filter(Boolean).length;
+  const tot=total();
+  const p=tot/5*100;
+  $("score").textContent="Mi nota: "+tot.toFixed(1)+" / 5.0";
+  $("fill").style.width=p+"%";$("plane").style.left=Math.max(p,4)+"%";
+  $("msg").textContent=msgs[n];
+  const nm=$("n").value.trim()||"Viajero";
+  $("vname").textContent=nm;
+  $("visa").classList.toggle("on",n===S.length);
+  $("pn").textContent=$("n").value.trim()||"Viajero sin nombre";
+  const up=s=>s.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Z0-9]+/g,"<");
+  const l1=("P<CADESPRO<<"+up($("n").value.trim()||"VIAJERO")+"<<").padEnd(40,"<").slice(0,40);
+  const l2=(up($("g").value.trim()||"GRADO")+"<"+up($("m").value.trim()||"MATERIA")+"<2026<PROFEMARCELA<<").padEnd(40,"<").slice(0,40);
+  $("mrz").textContent=l1+"\n"+l2;
+  $("pg").textContent="Grado: "+($("g").value.trim()||"___")+" · Materia: "+($("m").value.trim()||"___");
+}
+
+function aviso(t,campo){
+  $("alert").textContent=t;$("alert").classList.remove("hidden");
+  if(campo){$(campo).focus();$(campo).scrollIntoView({behavior:"smooth",block:"center"});}
+}
+
+async function enviar(){
+  if(enviado||enviando)return;
+  const nombre=$("n").value.trim(), grado=$("g").value.trim();
+  if(nombre.length<3)return aviso("✏️ Escribe tu nombre y apellido para que la Profe Marce sepa que eres tú.","n");
+  if(!grado)return aviso("✏️ Escribe tu grado (por ejemplo: 7° B).","g");
+  $("alert").classList.add("hidden");
+  enviando=true;const btn=$("send");btn.disabled=true;btn.textContent="Enviando…";
+  const sellos={};sellados().forEach((on,i)=>sellos["s"+(i+1)]=on);
+  try{
+    await addDoc(collection(db,COLECCION),{
+      nombre, grado, materia:$("m").value.trim(), meta:$("goal").value.trim(),
+      sellos, nota:Math.round(total()*10)/10, fecha:serverTimestamp()
+    });
+    enviado=true;
+    [...grid.children].forEach(b=>b.disabled=true);
+    ["n","g","m","goal"].forEach(id=>$(id).readOnly=true);
+    btn.classList.add("hidden");
+    $("ok").classList.remove("hidden");
+    $("reset").textContent="👤 Siguiente viajero";
+    $("ok").scrollIntoView({behavior:"smooth",block:"center"});
+  }catch(e){
+    console.error(e);
+    aviso("📶 No se pudo enviar. Revisa tu internet y vuelve a tocar Enviar.");
+    btn.disabled=false;btn.textContent="✉️ Enviar mi pasaporte a la Profe Marce";
+  }finally{enviando=false;}
+}
+
+$("send").onclick=enviar;
+["n","g","m"].forEach(id=>$(id).addEventListener("input",()=>{update();$("alert").classList.add("hidden");}));
+$("print").onclick=()=>window.print();
+$("reset").onclick=()=>{
+  enviado=false;
+  [...grid.children].forEach(b=>{b.disabled=false;b.setAttribute("aria-pressed","false");b.querySelector(".hint").textContent="Toca para sellar";});
+  ["n","g","m","goal"].forEach(id=>{$(id).value="";$(id).readOnly=false;});
+  $("send").classList.remove("hidden");$("send").disabled=false;$("send").textContent="✉️ Enviar mi pasaporte a la Profe Marce";
+  $("ok").classList.add("hidden");$("alert").classList.add("hidden");
+  $("reset").textContent="🔄 Empezar de nuevo";
+  update();window.scrollTo(0,0);
+};
+update();
+</script>
+</body>
+</html>

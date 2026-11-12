@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel de la Profe Marce · Pasaportes</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky1:#bfe6fb;--sky2:#fdf0d5;--ink:#1c2b4a;--muted:#55648a;--cover:#1d3b6e;--cover2:#2a56a0;--gold:#f2b84b;--paper:#fff9ea;--line:#e5d6ae;--card:#fff;--slot:#f6ecd2;--green:#1f9d72;--red:#e0524d}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Nunito",system-ui,sans-serif;color:var(--ink);background:linear-gradient(170deg,var(--sky1),var(--sky2));min-height:100vh}
+.wrap{max-width:1000px;margin:0 auto;padding:18px 16px 60px}
+h1,h2{font-family:"Fredoka",system-ui,sans-serif;margin:0}
+h2{font-size:21px;margin-bottom:10px}
+.card{background:var(--card);border-radius:22px;padding:18px;margin-top:16px;box-shadow:0 6px 18px rgba(20,35,80,.12)}
+.cover{background:radial-gradient(circle at 50% 30%,var(--cover2),var(--cover));color:#fff;border:4px solid var(--gold);border-radius:24px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.cover h1{color:var(--gold);font-size:clamp(22px,4vw,30px)}
+.cover small{display:block;opacity:.9}
+input,select{font:inherit;color:var(--ink);background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 12px}
+.login input{width:100%;margin:4px 0 12px}
+.btn{font:600 15px "Fredoka",system-ui,sans-serif;border:0;border-radius:999px;padding:9px 18px;cursor:pointer;background:var(--green);color:#fff}
+.btn.alt{background:#fff;color:var(--ink);border:2px solid var(--line)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.stat{background:var(--paper);border:2px dashed var(--line);border-radius:16px;padding:12px}
+.stat b{display:block;font-family:"Fredoka",sans-serif;font-size:30px;line-height:1.1;color:var(--cover2)}
+.srow{display:grid;grid-template-columns:34px 1fr 150px 54px;gap:10px;align-items:center;margin:10px 0}
+.srow .e{font-size:24px;text-align:center}
+.track{height:14px;background:var(--slot);border-radius:99px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:99px}
+.srow b{font-family:"Fredoka",sans-serif;text-align:right}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 6px;border-bottom:2px dashed var(--line);vertical-align:top}
+tr.al{cursor:pointer} tr.al:hover{background:var(--paper)}
+.det td{background:var(--paper)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{border-radius:999px;padding:2px 10px;font-size:14px;font-weight:700;border:2px solid var(--line)}
+.chip.on{background:rgba(127,216,181,.3);border-color:#7fd8b5}
+.chip.off{opacity:.55}
+.pill{display:inline-block;border-radius:999px;padding:0 10px;font-family:"Fredoka",sans-serif;font-weight:700}
+.muted{color:var(--muted)} .err{color:#C0392B;font-weight:700}
+.hidden{display:none}
+@media(max-width:640px){.srow{grid-template-columns:30px 1fr 70px 44px}.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="login" class="card login hidden" style="max-width:420px;margin:60px auto">
+    <h1>🛂 Panel de la Profe Marce</h1>
+    <p class="muted">Aquí llegan los pasaportes de tus estudiantes. Solo tú puedes entrar.</p>
+    <label for="em">Correo</label><input id="em" type="email" autocomplete="username">
+    <label for="pw">Contraseña</label><input id="pw" type="password" autocomplete="current-password">
+    <button class="btn" id="entrar">Entrar</button>
+    <p class="err hidden" id="lerr"></p>
+  </div>
+
+  <div id="panel" class="hidden">
+    <header class="cover">
+      <div><h1>🛂 Pasaportes recibidos</h1><small>Colegio CADESPRO · Profe Marcela</small></div>
+      <button class="btn alt" id="salir">Salir</button>
+    </header>
+
+    <div class="card">
+      <div class="tools">
+        <select id="fgrado"></select>
+        <select id="fmat"></select>
+        <input id="buscar" placeholder="Buscar nombre…">
+        <button class="btn" id="csv">Descargar Excel</button>
+      </div>
+    </div>
+
+    <div class="card"><div class="stats" id="stats"></div></div>
+
+    <div class="card">
+      <h2>¿Qué sellos lograron?</h2>
+      <p class="muted" style="margin:0 0 4px">Porcentaje de estudiantes que marcaron cada sello.</p>
+      <div id="sellos"></div>
+    </div>
+
+    <div class="card">
+      <h2>Cada viajero</h2>
+      <p class="muted" style="margin:0 0 6px">Toca un nombre para ver sus sellos y su meta.</p>
+      <table><thead><tr><th>Nombre</th><th>Grado</th><th class="hide-sm">Materia</th><th class="hide-sm">Fecha</th><th>Nota</th></tr></thead>
+      <tbody id="tabla"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig, COLECCION, SELLOS } from "./config.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app), db = getFirestore(app);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let datos = [], unsub = null, abierto = null;
+
+$("entrar").onclick = async () => {
+  $("lerr").classList.add("hidden");
+  try { await signInWithEmailAndPassword(auth, $("em").value.trim(), $("pw").value); }
+  catch { $("lerr").textContent = "Correo o contraseña incorrectos."; $("lerr").classList.remove("hidden"); }
+};
+$("pw").addEventListener("keydown", e => { if (e.key === "Enter") $("entrar").click(); });
+$("salir").onclick = () => signOut(auth);
+["buscar"].forEach(id => $(id).oninput = pintar);
+["fgrado","fmat"].forEach(id => $(id).onchange = pintar);
+$("csv").onclick = csv;
+
+onAuthStateChanged(auth, u => {
+  if (unsub) { unsub(); unsub = null; }
+  $("login").classList.toggle("hidden", !!u);
+  $("panel").classList.toggle("hidden", !u);
+  if (!u) return;
+  unsub = onSnapshot(query(collection(db, COLECCION), orderBy("fecha", "desc")),
+    snap => { datos = snap.docs.map(d => ({ id: d.id, ...d.data() })); opciones(); pintar(); },
+    err => { console.error(err); $("stats").innerHTML = `<p class="err">No tienes permiso para ver los pasaportes. Revisa que tu correo esté en las reglas de Firestore.</p>`; });
+});
+
+const norm = s => (s || "").toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[°º.\-\s]+/g, "").trim();
+function opciones(){
+  const llenar = (id, campo, todos) => {
+    const actual = $(id).value;
+    const vals = [...new Set(datos.map(r => norm(r[campo])).filter(Boolean))].sort();
+    $(id).innerHTML = `<option value="">${todos}</option>` + vals.map(v => `<option ${v===actual?"selected":""}>${esc(v)}</option>`).join("");
+  };
+  llenar("fgrado", "grado", "Todos los grados");
+  llenar("fmat", "materia", "Todas las materias");
+}
+const fecha = r => r.fecha?.toDate ? r.fecha.toDate() : null;
+const fmtF = d => d ? d.toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" }) : "—";
+const fmtN = n => typeof n === "number" ? n.toFixed(1) : "—";
+const colorNota = n => n >= 4 ? "#d6f5e9" : n >= 3 ? "#fde7c4" : "#ffe1dd";
+function filtrados(){
+  const b = $("buscar").value.trim().toLowerCase(), g = $("fgrado").value, m = $("fmat").value;
+  return datos.filter(r => (!b || (r.nombre||"").toLowerCase().includes(b)) && (!g || norm(r.grado) === g) && (!m || norm(r.materia) === m));
+}
+
+function pintar(){
+  const L = filtrados();
+  const notas = L.map(r => r.nota).filter(n => typeof n === "number");
+  const prom = notas.length ? notas.reduce((a,b)=>a+b,0)/notas.length : null;
+  const visas = L.filter(r => SELLOS.every((s,i) => r.sellos?.["s"+(i+1)])).length;
+  const apoyo = notas.filter(n => n < 3).length;
+  $("stats").innerHTML = `
+    <div class="stat"><b>${L.length}</b>pasaportes recibidos</div>
+    <div class="stat"><b>${fmtN(prom)}</b>nota promedio (de 5.0)</div>
+    <div class="stat"><b>${visas}</b>visas aprobadas 🛂 (6 sellos)</div>
+    <div class="stat"><b>${apoyo}</b>necesitan apoyo 💛 (menos de 3.0)</div>`;
+
+  $("sellos").innerHTML = SELLOS.map((s,i) => {
+    const si = L.filter(r => r.sellos?.["s"+(i+1)]).length;
+    const pct = L.length ? Math.round(si / L.length * 100) : 0;
+    return `<div class="srow"><span class="e">${s.e}</span><span>${esc(s.t)}</span><div class="track"><i style="width:${pct}%;background:${s.c}"></i></div><b>${L.length ? pct+"%" : "—"}</b></div>`;
+  }).join("");
+
+  $("tabla").innerHTML = L.length ? L.map(r => {
+    const fila = `<tr class="al" data-id="${r.id}"><td><b>${esc(r.nombre)}</b></td><td>${esc(r.grado||"—")}</td><td class="hide-sm">${esc(r.materia||"—")}</td><td class="hide-sm">${fmtF(fecha(r))}</td><td><span class="pill" style="background:${colorNota(r.nota)}">${fmtN(r.nota)}</span></td></tr>`;
+    if (abierto !== r.id) return fila;
+    const chips = SELLOS.map((s,i) => { const on = !!r.sellos?.["s"+(i+1)];
+      return `<span class="chip ${on?"on":"off"}">${on?"✅":"⬜"} ${s.e} ${esc(s.t)}</span>`; }).join("");
+    return fila + `<tr class="det"><td colspan="5"><div class="chips">${chips}</div>
+      <div><b>🎯 Su meta:</b> ${r.meta ? esc(r.meta) : '<span class="muted">No escribió meta.</span>'}</div>
+      <div class="muted" style="margin-top:4px">${esc(r.materia||"")} · ${fmtF(fecha(r))}</div></td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="muted">Todavía no hay pasaportes. Cuando un estudiante toque “Enviar”, aparecerá aquí.</td></tr>`;
+
+  document.querySelectorAll("tr.al").forEach(tr => tr.onclick = () => { abierto = abierto === tr.dataset.id ? null : tr.dataset.id; pintar(); });
+}
+
+function csv(){
+  const c = v => `"${String(v ?? "").replace(/"/g,'""')}"`;
+  const head = ["Nombre", "Grado", "Materia", "Fecha", ...SELLOS.map(s => s.t), "Nota (de 5.0)", "Meta"];
+  const rows = filtrados().map(r => [r.nombre, r.grado, r.materia, fmtF(fecha(r)),
+    ...SELLOS.map((s,i) => r.sellos?.["s"+(i+1)] ? "Sí" : "No"), fmtN(r.nota), r.meta]);
+  const texto = "﻿" + [head, ...rows].map(f => f.map(c).join(";")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([texto], { type: "text/csv;charset=utf-8" }));
+  a.download = "pasaportes_profe_marce.csv"; a.click();
+}
+</script>
+</body>
+</html>
